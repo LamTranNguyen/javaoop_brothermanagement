@@ -5,25 +5,25 @@
 package brothermanagement;
 import Controller.AdminController;
 import Model.Product;
-/**
- *
- * @author Dell Precision T5810
- */
+import javax.swing.*;
+
+ 
 public class Admistration extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Admistration.class.getName());
-
+    private AdminController controller;
     /**
      * Creates new form Home
      */
 
     public Admistration(String username) {
         initComponents();
+        System.out.println("Label: " + inventoryImageLabel);
         welcome_status.setText("Welcome " + username);
-        AdminController controller = new AdminController(this);
+        controller = new AdminController(this);
         controller.loadProductTypes();
         controller.loadStatusTypes();
-        AdminController get_table = new AdminController(table_item);
+        controller.loadProductsFromDatabase();
     }
     
     public javax.swing.JTable getTable(){
@@ -36,6 +36,28 @@ public class Admistration extends javax.swing.JFrame {
     
     public javax.swing.JComboBox<String> getStatusTypeList() {
         return statusTypeList;
+    }
+    
+    public Product getProduct_result(){
+        try {
+            int id = Integer.parseInt(id_field.getText().trim());
+            String name = name_field.getText().trim();
+            String type = (String) productTypeList.getSelectedItem();
+            double price = Double.parseDouble(price_field.getText().trim());
+            int stock = Integer.parseInt(stock_field.getText().trim());
+            String status = (String) statusTypeList.getSelectedItem();
+            String image = controller.getImagePath();
+
+            return new Product(id, name, type, price, status, image, stock);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Invalid input: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
+    
+    public JLabel getInventoryImageLabel() {
+        return inventoryImageLabel;
     }
 
     /**
@@ -67,19 +89,20 @@ public class Admistration extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         price_field = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
-        jButton8 = new javax.swing.JButton();
+        inventoryImageLabel = new javax.swing.JLabel();
+        import_btn = new javax.swing.JButton();
         add_btn = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
+        update_btn = new javax.swing.JButton();
+        delete_btn = new javax.swing.JButton();
+        clear_btn = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         statusTypeList = new javax.swing.JComboBox<>();
         menubar = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -103,7 +126,7 @@ public class Admistration extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(welcome_status)
-                .addGap(271, 271, 271))
+                .addGap(167, 167, 167))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -126,13 +149,13 @@ public class Admistration extends javax.swing.JFrame {
 
         table_item.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Product ID", "Product name", "Type", "Price", "Stock", "Status"
+                "Product ID", "Product name", "Type", "Price", "Stock", "Status", "Image"
             }
         ));
         table_item.setGridColor(new java.awt.Color(204, 204, 204));
@@ -182,15 +205,20 @@ public class Admistration extends javax.swing.JFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addComponent(inventoryImageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 171, Short.MAX_VALUE)
+            .addComponent(inventoryImageLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
         );
 
-        jButton8.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jButton8.setText("Import");
+        import_btn.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        import_btn.setText("Import");
+        import_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                import_btnActionPerformed(evt);
+            }
+        });
 
         add_btn.setBackground(new java.awt.Color(255, 51, 51));
         add_btn.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
@@ -202,28 +230,33 @@ public class Admistration extends javax.swing.JFrame {
             }
         });
 
-        jButton6.setBackground(new java.awt.Color(255, 51, 51));
-        jButton6.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jButton6.setForeground(new java.awt.Color(255, 255, 255));
-        jButton6.setText("Update");
-
-        jButton7.setBackground(new java.awt.Color(255, 51, 51));
-        jButton7.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jButton7.setForeground(new java.awt.Color(255, 255, 255));
-        jButton7.setText("Delete");
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
+        update_btn.setBackground(new java.awt.Color(255, 51, 51));
+        update_btn.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        update_btn.setForeground(new java.awt.Color(255, 255, 255));
+        update_btn.setText("Update");
+        update_btn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
+                update_btnActionPerformed(evt);
             }
         });
 
-        jButton10.setBackground(new java.awt.Color(255, 51, 51));
-        jButton10.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jButton10.setForeground(new java.awt.Color(255, 255, 255));
-        jButton10.setText("Clear");
-        jButton10.addActionListener(new java.awt.event.ActionListener() {
+        delete_btn.setBackground(new java.awt.Color(255, 51, 51));
+        delete_btn.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        delete_btn.setForeground(new java.awt.Color(255, 255, 255));
+        delete_btn.setText("Delete");
+        delete_btn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton10ActionPerformed(evt);
+                delete_btnActionPerformed(evt);
+            }
+        });
+
+        clear_btn.setBackground(new java.awt.Color(255, 51, 51));
+        clear_btn.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        clear_btn.setForeground(new java.awt.Color(255, 255, 255));
+        clear_btn.setText("Clear");
+        clear_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clear_btnActionPerformed(evt);
             }
         });
 
@@ -276,14 +309,14 @@ public class Admistration extends javax.swing.JFrame {
                         .addGap(97, 97, 97)
                         .addComponent(add_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(50, 50, 50)
-                        .addComponent(jButton6)
+                        .addComponent(update_btn)
                         .addGap(50, 50, 50)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(delete_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(50, 50, 50)
-                        .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(clear_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                    .addComponent(import_btn, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE))
                 .addGap(49, 49, 49))
         );
@@ -295,7 +328,7 @@ public class Admistration extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton8))
+                        .addComponent(import_btn))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -317,9 +350,9 @@ public class Admistration extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(add_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(update_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(delete_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(clear_btn, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(152, Short.MAX_VALUE))
         );
 
@@ -351,14 +384,14 @@ public class Admistration extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(product_menu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(264, Short.MAX_VALUE))
+                .addContainerGap(252, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(product_menu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(237, Short.MAX_VALUE))
         );
 
         menubar.setBackground(new java.awt.Color(255, 255, 255));
@@ -389,6 +422,11 @@ public class Admistration extends javax.swing.JFrame {
         jButton3.setForeground(new java.awt.Color(255, 255, 255));
         jButton3.setText("Staff Profile");
 
+        jButton9.setBackground(new java.awt.Color(255, 51, 51));
+        jButton9.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jButton9.setForeground(new java.awt.Color(255, 255, 255));
+        jButton9.setText("Log Out");
+
         jButton4.setBackground(new java.awt.Color(204, 51, 0));
         jButton4.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         jButton4.setForeground(new java.awt.Color(204, 204, 204));
@@ -399,35 +437,34 @@ public class Admistration extends javax.swing.JFrame {
             }
         });
 
-        jButton9.setBackground(new java.awt.Color(255, 51, 51));
-        jButton9.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        jButton9.setForeground(new java.awt.Color(255, 255, 255));
-        jButton9.setText("Log Out");
-
         javax.swing.GroupLayout menubarLayout = new javax.swing.GroupLayout(menubar);
         menubar.setLayout(menubarLayout);
         menubarLayout.setHorizontalGroup(
             menubarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, menubarLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(menubarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         menubarLayout.setVerticalGroup(
             menubarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(menubarLayout.createSequentialGroup()
-                .addGap(32, 32, 32)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addGap(34, 34, 34)
                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addGap(50, 50, 50)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(50, 50, 50)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(50, 50, 50)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(50, 50, 50)
                 .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(588, Short.MAX_VALUE))
+                .addContainerGap(560, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -451,8 +488,8 @@ public class Admistration extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(menubar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(menubar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
 
         pack();
@@ -468,16 +505,8 @@ public class Admistration extends javax.swing.JFrame {
 
     private void add_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add_btnActionPerformed
         // TODO add your handling code here:
-        String name = name_field.getText();
-        double price = Double.parseDouble(price_field.getText());
-        int stock = Integer.parseInt(stock_field.getText());
-        String type = (String) productTypeList.getSelectedItem();
-        int id = Integer.parseInt(id_field.getText());
-        String status = (String) statusTypeList.getSelectedItem();
-       
-        Product new_pro = new Product(id, name, type, price, status, "testimg", stock);
-        AdminController add_pro = new AdminController(table_item);
-        add_pro.addProduct(new_pro);
+        Product product = getProduct_result();
+        controller.addProduct(product);
     }//GEN-LAST:event_add_btnActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -488,17 +517,36 @@ public class Admistration extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_productTypeListActionPerformed
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    private void delete_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delete_btnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton7ActionPerformed
+        controller.deleteProduct(table_item);
+    }//GEN-LAST:event_delete_btnActionPerformed
 
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+    private void clear_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_btnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton10ActionPerformed
+        id_field.setText("");
+        name_field.setText("");
+        price_field.setText("");
+        stock_field.setText("");
+        productTypeList.setSelectedIndex(0);
+        statusTypeList.setSelectedIndex(0);
+        inventoryImageLabel.setIcon(null);
+    }//GEN-LAST:event_clear_btnActionPerformed
 
     private void statusTypeListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusTypeListActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_statusTypeListActionPerformed
+
+    private void update_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_update_btnActionPerformed
+        // TODO add your handling code here:
+        Product product = getProduct_result();
+        controller.updateProduct(product);
+    }//GEN-LAST:event_update_btnActionPerformed
+
+    private void import_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_import_btnActionPerformed
+        // TODO add your handling code here:
+        controller.importImage();
+    }//GEN-LAST:event_import_btnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -527,15 +575,15 @@ public class Admistration extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton add_btn;
+    private javax.swing.JButton clear_btn;
+    private javax.swing.JButton delete_btn;
     private javax.swing.JTextField id_field;
+    private javax.swing.JButton import_btn;
+    private javax.swing.JLabel inventoryImageLabel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -558,6 +606,7 @@ public class Admistration extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> statusTypeList;
     private javax.swing.JTextField stock_field;
     private javax.swing.JTable table_item;
+    private javax.swing.JButton update_btn;
     private javax.swing.JLabel welcome_status;
     // End of variables declaration//GEN-END:variables
 }

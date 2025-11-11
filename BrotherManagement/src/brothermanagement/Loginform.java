@@ -230,7 +230,7 @@ public class Loginform extends javax.swing.JFrame {
         if (loggedUser != null) {
             this.dispose();
             String username = loggedUser.getUsername();
-            PlaceOrder home = new PlaceOrder(username);
+            Admistration home = new Admistration(username);
             home.setVisible(true);
             home.setTitle("Home page");
         }

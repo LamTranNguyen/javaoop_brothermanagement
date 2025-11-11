@@ -29,10 +29,15 @@ public class Product {
         this.stock = stock;
     }
     
+    public void setImage(String img){
+        this.image = img;
+    }
+    
     public int getId() { return pro_id; }
     public String getName() { return pro_name; }
     public String getType() { return category; }
     public double getPrice() { return price; }
     public String getStatus() { return status; }
     public int getStock() { return stock; }
+    public String getImage() { return image; }
 }
